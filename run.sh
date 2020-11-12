@@ -23,6 +23,8 @@ echo "Starting ruh.sh."
 print_stderr() { printf "%s\n" "$*" >&2; } # print message to stderr (newline character included): print_stderr "<message>"
 
 # default files
+F_FA_A_ORIG=""
+F_FA_B_ORIG=""
 
 # handle given arguments
 # ./czech_ssc_linker.sh [-c czech.lnp_file] [-s ssc.def_file] [-o output_file]"
@@ -88,9 +90,16 @@ while getopts :c:s:o:h o; do
     esac
 done
 
+F_FA_A_ORIG="/mnt/DATA/Data/David/School/projPrax/optimizing_automata_product_construction_and_emptiness_test/basicDFAs/DFA_4s1f_01"
 
-python3 ./prepare_fa.py /mnt/DATA/Data/David/School/projPrax/optimizing_automata_product_construction_and_emptiness_test/basicDFAs/DFA_4s1f_01
-python3 ./change_transitions.py /mnt/DATA/Data/David/School/projPrax/optimizing_automata_product_construction_and_emptiness_test/basicDFAs/DFA_4s1f_01 /mnt/DATA/Data/David/School/projPrax/optimizing_automata_product_construction_and_emptiness_test/basicDFAs/star_DFA_4s1f_01
+cp "$F_FA_A_ORIG" ./
+F_FA_A_NAME=$(basename "$F_FA_A_ORIG")
+F_FA_A_STAR="$F_FA_A_NAME"_STAR
+
+#echo "$F_FA_A_STAR" #DEBUG
+
+python3 ./prepare_fa.py "$(pwd)"/"$F_FA_A_NAME"
+python3 ./change_transitions.py "$(pwd)"/"$F_FA_A_NAME"_dawdawd "$(pwd)"/"$F_FA_A_STAR"
 
 
 
