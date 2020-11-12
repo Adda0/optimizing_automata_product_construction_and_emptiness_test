@@ -1,0 +1,10 @@
+Ops 1:1 0:1 x:0
+
+Automaton M1 @LFA
+States q0 q1 q2
+Final States q2
+Transitions
+x -> q0
+1(q0) -> q1
+0(q1) -> q2
+1(q2) -> q1
