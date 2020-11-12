@@ -11,6 +11,7 @@
 # author: David Chocholatý (xchoch08), FIT BUT
 # ====================================================
 
+import os
 import sys
 sys.path.append('/mnt/DATA/Data/David/School/projPrax/symboliclib/symboliclib/') #DEBUG
 import symboliclib
@@ -26,7 +27,8 @@ def main():
         file_fa = open(fa_name, "r")
         file_fa_dest = open(fa_name_dest, "w+")
     except IOError:
-        print("Opening file failed.", sep='', end='\n', file=sys.stderr)
+        file_name = os.path.basename(__file__)
+        print('ERROR: ' + file_name + ': Opening file failed.', sep='', end='\n', file=sys.stderr)
         exit()
 
 
