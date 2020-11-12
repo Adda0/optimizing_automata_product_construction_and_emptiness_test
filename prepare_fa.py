@@ -20,6 +20,12 @@ def main():
     automaton_name = sys.argv[1]
 
     fa_a = symboliclib.parse(automaton_name)
+    name = fa_a.get_automaton_name()
+    print(name)
+
+    fa_a.rename_automaton("test")
+    name = fa_a.get_automaton_name()
+    print(name)
     fa_a = fa_a.simple_reduce()
     fa_a = fa_a.determinize()
     #fa_a.print_automaton() #DEBUG
