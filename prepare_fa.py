@@ -25,7 +25,8 @@ def main():
     fa_a = symboliclib.parse(automaton_name)
     fa_a = fa_a.simple_reduce()
     fa_a = fa_a.determinize()
-    fa_a.print_automaton()
+    #fa_a.print_automaton() #DEBUG
+    fa_a.print_automaton(automaton_name)
 
 
 
