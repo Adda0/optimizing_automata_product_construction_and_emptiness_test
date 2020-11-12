@@ -29,6 +29,9 @@ def main():
     fa_a = fa_a.simple_reduce()
     fa_a = fa_a.determinize()
     #fa_a.print_automaton() #DEBUG
+
+    fa_a.change_initial_state(fa_a.states)
+
     fa_a.print_automaton(automaton_name)
 
 
