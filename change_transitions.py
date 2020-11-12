@@ -13,7 +13,6 @@
 
 import os
 import sys
-sys.path.append('/mnt/DATA/Data/David/School/projPrax/symboliclib/symboliclib/') #DEBUG
 import symboliclib
 
 
@@ -66,8 +65,8 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Starting prepare_fa.py.")  # DEBUG
+    print("Starting change_transitions.py.")  # DEBUG
     main()
-    print("Ending prepare_fa.py.")  # DEBUG
+    print("Ending change_transitions.py.")  # DEBUG
 
 # End of file prepare_fa.py #

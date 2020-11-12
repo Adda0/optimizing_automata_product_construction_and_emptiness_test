@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# OBSOLETE
+
 # ====================================================
 # file name: rename_automaton.py
 #

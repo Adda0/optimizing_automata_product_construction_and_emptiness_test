@@ -3,25 +3,22 @@
 # ====================================================
 # file name: prepar_fa.py
 #
-# Script to prepare given finite automata
-# for optimizing
+# Script to prepare given finite automata for optimizing
 # ====================================================
-# project: IP1 | Optimizing Automata Product
-#                Construction and Emptiness Test
-# "Optimalizace automatové konstrukce produktu a testu
-#  prázdnosti jazyka"
+# project: IP1 | Optimizing Automata Product Construction and Emptiness Test
+# "Optimalizace automatové konstrukce produktu a testu prázdnosti jazyka"
 #
 # author: David Chocholatý (xchoch08), FIT BUT
 # ====================================================
 
 import sys
-sys.path.append('/mnt/DATA/Data/David/School/projPrax/symboliclib/symboliclib/') #DEBUG
 import symboliclib
 
 
 # Main script function
 def main():
     automaton_name = sys.argv[1]
+
     fa_a = symboliclib.parse(automaton_name)
     fa_a = fa_a.simple_reduce()
     fa_a = fa_a.determinize()

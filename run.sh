@@ -3,21 +3,18 @@
 # ====================================================
 # file name: run.sh
 #
-# Base script for optimizing automata product
-# constract and emptiness test
+# Base script for optimizing automata product constract and emptiness test
 # ====================================================
-# project: IP1 | Optimizing Automata Product
-#                Construction and Emptiness Test
-# "Optimalizace automatové konstrukce produktu a testu
-#  prázdnosti jazyka"
+# project: IP1 | Optimizing Automata Product Construction and Emptiness Test
+# "Optimalizace automatové konstrukce produktu a testu prázdnosti jazyka"
 #
 # author: David Chocholatý (xchoch08), FIT BUT
 # ====================================================
 
 export POSIXLY_CORRECT=yes
-export PATH=$PATH:/mnt/Data/David/School/projPrax/symboliclib/
 
 echo "Starting ruh.sh."
+
 
 # functions
 print_stderr() { printf "%s\n" "$*" >&2; } # print message to stderr (newline character included): print_stderr "<message>"
