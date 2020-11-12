@@ -52,7 +52,7 @@ def main():
         line = file_fa.readline()
         if not line:
             break
-        if '(' in line:
+        if '->' in line and not line.startswith('x -> ') :
             line_split = line.split('(', 2)
             line_split[0] = '*('
             file_fa_dest.write(line_split[0] + line_split[1])
