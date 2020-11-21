@@ -21,42 +21,37 @@ def main():
     def get_next_state():
         #'q4': {*: ['q3']}
         nonlocal curr_state
+        nonlocal length
         curr_state = {fa.transitions.get(next(iter(curr_state))).get('*')[0]}
-        print(curr_state)  #DEBUG
-        print(type(curr_state))  #DEBUG
+        length += 1
 
 
     automaton_name = sys.argv[1]
     fa = symboliclib.parse(automaton_name)
 
     curr_state = fa.start
-    print(curr_state)  #DEBUG
-    print(type(curr_state))  #DEBUG
+    length = 0
+    formulas_for_states = {}
+    last_state_to_stop = ''
 
-    visited_states = {}
+    while True:
+        if not curr_state.issubset(fa.final):
+            get_next_state()
+            curr_state_iter = next(iter(curr_state))
+        else:  # current state is also an accept state
+            try:
+                if not formulas_for_states[curr_state_iter][0]:
+                    formulas_for_states[curr_state_iter][0] = True
+                    formulas_for_states[curr_state_iter][1] += ' + ' + str(length - int(formulas_for_states[curr_state_iter][1])) + 'k'
+                if last_state_to_stop == curr_state_iter:
+                    break
+            except KeyError:
+                formulas_for_states[curr_state_iter] = [False, str(length)]
+                last_state_to_stop = curr_state_iter
 
-    num = 1
+            get_next_state()
 
-    formula = ''
-    handle_length = 0
-
-    handle = True
-
-    print(fa.transitions)
-
-
-
-
-    for state in fa.states:
-        if handle:
-            if not curr_state in fa.final:
-                handle_length += 1
-                get_next_state()
-            else:
-                formula = str(handle_length)
-                print(handle_length)
-                handle = False
-    print(formula)
+    print(formulas_for_states)
 
 
 
