@@ -87,7 +87,8 @@ while getopts :a:b:o:h o; do
     esac
 done
 
-cp "$F_FA_A_ORIG" ./
+mkdir -p ./fa_files
+cp "$F_FA_A_ORIG" ./fa_files/
 F_FA_A_NAME=$(basename "$F_FA_A_ORIG")
 
 #cp "$F_FA_B_ORIG" ./
@@ -95,15 +96,11 @@ F_FA_A_NAME=$(basename "$F_FA_A_ORIG")
 
 #python3 ./remove_comments_from_fa.py "$(pwd)"/"$F_FA_A_NAME" "$(pwd)"/"$F_FA_A_NAME"_no_comments
 
-#echo "$F_FA_A_STAR" #DEBUG
-
-#python3 ./prepare_fa.py "$(pwd)"/"$F_FA_A_NAME"
-
 # set all transitons to '*'
-python3 ./change_transitions.py "$(pwd)"/"$F_FA_A_NAME" "$(pwd)"/"$F_FA_A_NAME"_ASTERISK
+python3 ./change_transitions.py "$(pwd)"/fa_files/"$F_FA_A_NAME" "$(pwd)"/fa_files/"$F_FA_A_NAME"_ASTERISK
 
 # determinize the FA with '*' transitions
-python3 ./determinize_fa.py "$(pwd)"/"$F_FA_A_NAME"_ASTERISK "$(pwd)"/"$F_FA_A_NAME"_DETERMINIZED
+python3 ./determinize_fa.py "$(pwd)"/fa_files/"$F_FA_A_NAME"_ASTERISK "$(pwd)"/fa_files/"$F_FA_A_NAME"_DETERMINIZED
 
 
 

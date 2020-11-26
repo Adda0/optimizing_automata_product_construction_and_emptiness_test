@@ -19,7 +19,6 @@ import symboliclib
 # Main script function
 def main():
     def get_next_state():
-        #'q4': {*: ['q3']}
         nonlocal curr_state
         nonlocal length
         curr_state = {fa.transitions.get(next(iter(curr_state))).get('*')[0]}
@@ -38,7 +37,7 @@ def main():
         if not curr_state.issubset(fa.final):
             get_next_state()
             curr_state_iter = next(iter(curr_state))
-        else:  # current state is also an accept state
+        else:  # the current state is also an accept state
             try:
                 if not formulas_for_states[curr_state_iter][0]:
                     formulas_for_states[curr_state_iter][0] = True
@@ -67,4 +66,4 @@ if __name__ == "__main__":
     main()
     print("Ending change_transitions.py.")  #DEBUG
 
-# End of file prepare_fa.py #
+# End of file #
