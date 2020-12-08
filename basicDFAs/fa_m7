@@ -1,0 +1,14 @@
+Ops 1:1 0:1 x:0
+
+Automaton M7 @LFA
+States q0 q1 q2 q3 q4
+Final States q2 q4
+Transitions
+x -> q0
+0(q0) -> q1
+1(q0) -> q2
+0(q0) -> q3
+1(q1) -> q2
+0(q2) -> q3
+1(q3) -> q4
+0(q4) -> q1
