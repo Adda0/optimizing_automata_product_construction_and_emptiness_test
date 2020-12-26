@@ -23,7 +23,6 @@ def main():
     fa_a = symboliclib.parse(fa_a_name)
     fa_b = symboliclib.parse(fa_b_name)
 
-
     fa_a.unify_transition_symbols()
     fa_b.unify_transition_symbols()
 
@@ -34,11 +33,15 @@ def main():
     fa_b = fa_b.determinize()
 
     fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
+    print(fa_a_formulas_dict)  # DEBUG
     fa_b_formulas_dict = fa_b.count_formulas_for_lfa()
+    print(fa_b_formulas_dict)  # DEBUG
+    """
+
     fa_b_formulas_dict = change_formulas_variable(fa_b_formulas_dict, 'l')
 
-    print(fa_a_formulas_dict)  # DEBUG
-    print(fa_b_formulas_dict)  # DEBUG
+
+
 
     fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
     fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
@@ -46,7 +49,7 @@ def main():
     print(fa_a_only_formulas)  # DEBUG
     print(fa_b_only_formulas)  # DEBUG
 
-
+"""
     """
     (declare-const x Int)
     (declare-const y Int)
@@ -56,7 +59,14 @@ def main():
     """
 
 
-
+    """
+    # Using eval to parse the string.
+    x = fa_a_only_formulas[0]
+    y = fa_b_only_formulas[0]
+    s = "( == )"
+    f2 = eval(s)
+    print(f2)
+    """
 
 
 
