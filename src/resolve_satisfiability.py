@@ -51,22 +51,9 @@ def main():
 
 """
     """
-    (declare-const x Int)
-    (declare-const y Int)
-    (assert (= x y))
-    (check-sat)
-    (get-model)
     """
 
 
-    """
-    # Using eval to parse the string.
-    x = fa_a_only_formulas[0]
-    y = fa_b_only_formulas[0]
-    s = "( == )"
-    f2 = eval(s)
-    print(f2)
-    """
 
 
 
