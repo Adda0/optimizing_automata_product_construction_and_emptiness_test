@@ -29,62 +29,84 @@ def main():
     q_a_states = deque()
     q_b_states = deque()
 
-    # enqueue the initial states
-    for initial_state in fa_a_orig.start:
-        q_a_states.append(initial_state)
-    for initial_state in fa_b_orig.start:
-        q_b_states.append(initial_state)
+    fa_a_checked_states = []
+    fa_b_checked_states = []
 
     q_pair_states = deque()
 
-    def make_pair_states(q_pair_states, q_a_states, q_b_states):
-        for a_state in q_a_states:
-            for b_state in q_b_states:
-                q_pair_states.append([a_state, b_state])
-
-        q_a_states.clear()
-        q_b_states.clear()
+    # enqueue the initial states
+    for initial_state in fa_a_orig.start:
+        q_a_states.append(initial_state)
+        fa_a_checked_states.append(initial_state)
+    for initial_state in fa_b_orig.start:
+        q_b_states.append(initial_state)
+        fa_b_checked_states.append(initial_state)
 
     make_pair_states(q_pair_states, q_a_states, q_b_states)
 
+    while(q_pair_states):
+        curr_pair = q_pair_states.popleft()
 
-    """
-    # enqueue the rest of the states
-    for state in fa_a_orig.states:
-        if not state in fa_a_orig.start:
-            fa_a_states.put(state)
-    """
+        fa_a = deepcopy(fa_a_orig)
+        fa_b = deepcopy(fa_b_orig)
 
-    fa_a = deepcopy(fa_a_orig)
-    fa_b = deepcopy(fa_b_orig)
+        fa_a.unify_transition_symbols()
+        fa_b.unify_transition_symbols()
 
-    fa_a.unify_transition_symbols()
-    fa_b.unify_transition_symbols()
+        fa_a.start = {curr_pair[0]}
+        fa_b.start = {curr_pair[1]}
 
-    curr_pair = q_pair_states.popleft()
-    fa_a.start = {curr_pair[0]}
-    fa_b.start = {curr_pair[1]}
+        det_states = {}
 
-    fa_a = fa_a.simple_reduce()
-    fa_a = fa_a.determinize()
+        fa_a = fa_a.simple_reduce()
+        fa_a = fa_a.determinize_check(det_states)
 
-    fa_b = fa_b.simple_reduce()
-    fa_b = fa_b.determinize()
+        fa_b = fa_b.simple_reduce()
+        fa_b = fa_b.determinize_check(det_states)
 
-    fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
-    #print(fa_a_formulas_dict)  # DEBUG
-    fa_b_formulas_dict = fa_b.count_formulas_for_lfa()
-    #print(fa_b_formulas_dict)  # DEBUG
+        fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
+        print(fa_a_formulas_dict)  # DEBUG
+        fa_b_formulas_dict = fa_b.count_formulas_for_lfa()
+        print(fa_b_formulas_dict)  # DEBUG
 
-    #fa_a_only_formulas = [[1, 0], [8, 0]]
+        #fa_a_only_formulas = [[1, 0], [8, 0]]
 
-    satisfiability = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
-    print(satisfiability)
+        satisfiability = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
+        print(satisfiability)
 
-    # ^ fast test whether the initial state is satisfiable.
+        # ^ fast test whether the initial state is satisfiable.
 
 
+        # test the following states
+        # enqueue the following state
+        for initial_state in fa_a.start:
+            enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
+        for initial_state in fa_b.start:
+            enqueue_next_states(q_b_states, fa_b_checked_states, fa_b_orig, initial_state)
 
+        make_pair_states(q_pair_states, q_a_states, q_b_states)
+
+
+
+
+def make_pair_states(q_pair_states, q_a_states, q_b_states):
+    for a_state in q_a_states:
+        for b_state in q_b_states:
+            q_pair_states.append([a_state, b_state])
+
+    q_a_states.clear()
+    q_b_states.clear()
+
+
+def enqueue_next_states(q_states, fa_checked_states, fa_orig, curr_state):
+    transitions = fa_orig.get_deterministic_transitions(curr_state)
+
+    for trans_symbol in transitions:
+        #transitions[trans_symbol] = ['q1', 'q2', 'q0']  # DEBUG
+        for state in transitions[trans_symbol]:
+            if not state in fa_checked_states:
+                fa_checked_states.append(state)
+                q_states.append(state)
 
 
 def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
