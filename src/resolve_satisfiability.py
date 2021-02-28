@@ -3,7 +3,7 @@
 # ====================================================
 # file name: resolve_satisfiability.py
 #
-# Script to resolve satisfiability of given formulas using Z3 SMT solver.
+# Script to resolve satisfiable of given formulas using Z3 SMT solver.
 # ====================================================
 # project: IP1 | Optimizing Automata Product Construction and Emptiness Test
 # "Optimalizace automatové konstrukce produktu a testu prázdnosti jazyka"
@@ -42,6 +42,7 @@ def main():
         q_b_states.append(initial_state)
         fa_b_checked_states.append(initial_state)
 
+    # Pair the initial states.
     make_pair_states(q_pair_states, q_a_states, q_b_states)
 
     while(q_pair_states):
@@ -56,29 +57,33 @@ def main():
         fa_a.start = {curr_pair[0]}
         fa_b.start = {curr_pair[1]}
 
-        det_states = {}
+        # Already encountered handle and loop states.
+        fa_a_det_states = {}
+        fa_b_det_states = {}
+        fa_ab_det_states = {}
 
         fa_a = fa_a.simple_reduce()
-        fa_a = fa_a.determinize_check(det_states)
+        fa_a = fa_a.determinize_check(fa_a_det_states)
+        #fa_a.print_automaton()
 
         fa_b = fa_b.simple_reduce()
-        fa_b = fa_b.determinize_check(det_states)
+        fa_b = fa_b.determinize_check(fa_b_det_states)
+        #fa_b.print_automaton()
 
         fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
         print(fa_a_formulas_dict)  # DEBUG
         fa_b_formulas_dict = fa_b.count_formulas_for_lfa()
         print(fa_b_formulas_dict)  # DEBUG
 
-        #fa_a_only_formulas = [[1, 0], [8, 0]]
+        satisfiable = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
+        print(satisfiable)
 
-        satisfiability = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
-        print(satisfiability)
+        if curr_pair[0] in fa_a_orig.final and curr_pair[1] in fa_b_orig.final and satisfiable:
+            # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
+            print('SUCCESS: Automata have a non-empty intersection.')
+            exit(0)
 
-        # ^ fast test whether the initial state is satisfiable.
-
-
-        # test the following states
-        # enqueue the following state
+        # Enqueue the following state(s).
         for initial_state in fa_a.start:
             enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
         for initial_state in fa_b.start:
@@ -86,6 +91,8 @@ def main():
 
         make_pair_states(q_pair_states, q_a_states, q_b_states)
 
+    print("FAILURE: Automata have an empty intersection.")
+    exit(1)
 
 
 
@@ -111,7 +118,7 @@ def enqueue_next_states(q_states, fa_checked_states, fa_orig, curr_state):
 
 def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
     """
-    Check satisfiability for formulas using SMT solver Z3.
+    Check satisfiable for formulas using SMT solver Z3.
     :param fa_a_formulas_dict: Dictionary with formulas for FA A.
     :param fa_b_formulas_dict: Dictionary with formulas for FA B.
     :return: True if satisfiable; False if not satisfiable.
