@@ -1,6 +1,6 @@
 Ops a:1 b:1 c:1 x:0
 
-Automaton M7 @LFA
+Automaton M8 @LFA
 States s q0 q1 q2 q3 q4 q5 q6 q7
 Final States q2 q5
 Transitions

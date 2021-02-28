@@ -37,16 +37,17 @@ def main():
     # enqueue the initial states
     for initial_state in fa_a_orig.start:
         q_a_states.append(initial_state)
-        fa_a_checked_states.append(initial_state)
+        #fa_a_checked_states.append(initial_state)
     for initial_state in fa_b_orig.start:
         q_b_states.append(initial_state)
-        fa_b_checked_states.append(initial_state)
+        #fa_b_checked_states.append(initial_state)
 
     # Pair the initial states.
     make_pair_states(q_pair_states, q_a_states, q_b_states)
 
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
+        print(curr_pair)
 
         fa_a = deepcopy(fa_a_orig)
         fa_b = deepcopy(fa_b_orig)
@@ -82,6 +83,10 @@ def main():
             # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
             print('SUCCESS: Automata have a non-empty intersection.')
             exit(0)
+        elif not q_pair_states and not satisfiable:
+            # When there is only one branch and satisfiable is False, intersection must be empty. Stop generating another states.
+            break
+
 
         # Enqueue the following state(s).
         for initial_state in fa_a.start:
@@ -109,12 +114,17 @@ def enqueue_next_states(q_states, fa_checked_states, fa_orig, curr_state):
     transitions = fa_orig.get_deterministic_transitions(curr_state)
 
     for trans_symbol in transitions:
-        #transitions[trans_symbol] = ['q1', 'q2', 'q0']  # DEBUG
-        for state in transitions[trans_symbol]:
-            if not state in fa_checked_states:
-                fa_checked_states.append(state)
-                q_states.append(state)
 
+        #transitions[trans_symbol] = ['q1', 'q2', 'q0']  # DEBUG
+        for state_dict_elem in transitions[trans_symbol]:
+            for state in state_dict_elem.split(','):
+                """
+                if not state in fa_checked_states:
+                    fa_checked_states.append(state)
+                    q_states.append(state)
+                """
+                #fa_checked_states.append(state)
+                q_states.append(state)
 
 def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
     """
