@@ -1,0 +1,17 @@
+Ops a:1 b:1 c:1 x:0
+
+Automaton M7 @LFA
+States s q0 q1 q2 q3 q4 q5 q6 q7
+Final States q2 q5
+Transitions
+x -> s
+a(s) -> q0
+b(q0) -> q1
+b(q0) -> q5
+b(q1) -> q2
+c(q2) -> q3
+a(q3) -> q4
+a(q4) -> q1
+b(q5) -> q6
+c(q6) -> q7
+a(q7) -> q0
