@@ -83,18 +83,18 @@ def main():
             # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
             print('SUCCESS: Automata have a non-empty intersection.')
             exit(0)
-        elif not q_pair_states and not satisfiable:
+        #elif not q_pair_states and not satisfiable:
             # When there is only one branch and satisfiable is False, intersection must be empty. Stop generating another states.
-            break
+        #    break
+        elif satisfiable:
 
+            # Enqueue the following state(s).
+            for initial_state in fa_a.start:
+                enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
+            for initial_state in fa_b.start:
+                enqueue_next_states(q_b_states, fa_b_checked_states, fa_b_orig, initial_state)
 
-        # Enqueue the following state(s).
-        for initial_state in fa_a.start:
-            enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
-        for initial_state in fa_b.start:
-            enqueue_next_states(q_b_states, fa_b_checked_states, fa_b_orig, initial_state)
-
-        make_pair_states(q_pair_states, q_a_states, q_b_states)
+            make_pair_states(q_pair_states, q_a_states, q_b_states)
 
     print("FAILURE: Automata have an empty intersection.")
     exit(1)
