@@ -20,19 +20,22 @@ def main():
     automaton_name = sys.argv[1]
 
     fa_a = symboliclib.parse(automaton_name)
-    name = fa_a.get_automaton_name()
-    print(name)
+    #name = fa_a.get_automaton_name()
+    #print(name)
 
-    fa_a.rename_automaton("test")
-    name = fa_a.get_automaton_name()
-    print(name)
+    #fa_a.rename_automaton("test")
+    #name = fa_a.get_automaton_name()
+    #print(name)
+    fa_a.unify_transition_symbols()
+
     fa_a = fa_a.simple_reduce()
     fa_a = fa_a.determinize()
+    fa_a.print_automaton('tmp_automaton')
     #fa_a.print_automaton() #DEBUG
 
-    fa_a.change_initial_state(fa_a.states)
+    #fa_a.change_initial_state(fa_a.states)
 
-    fa_a.print_automaton(automaton_name)
+    #fa_a.print_automaton(automaton_name)
 
 
 

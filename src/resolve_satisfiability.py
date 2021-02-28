@@ -130,8 +130,8 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
 
     fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
     fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
-    #print(fa_a_only_formulas)  # DEBUG
-    #print(fa_b_only_formulas)  # DEBUG
+    print(fa_a_only_formulas)  # DEBUG
+    print(fa_b_only_formulas)  # DEBUG
 
     smt = Solver()
     fa_a_var = Int('fa_a_var')
@@ -144,7 +144,7 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
             smt.add(fa_a_id[0] + fa_a_id[1] * fa_a_var == fa_b_id[0] + fa_b_id[1] * fa_b_var)
 
             if smt.check() == sat:
-                #print(smt.model())  # DEBUG
+                print(smt.model())  # DEBUG
                 return True
 
             smt.pop()
