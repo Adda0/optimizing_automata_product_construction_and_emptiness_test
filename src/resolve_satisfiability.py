@@ -14,6 +14,8 @@
 import os
 import sys
 import symboliclib
+#from sa import SA
+from lfa import LFA
 from z3 import *
 from copy import deepcopy
 from collections import deque
@@ -45,6 +47,9 @@ def main():
     # Pair the initial states.
     make_pair_states(q_pair_states, q_a_states, q_b_states)
 
+    fa_a_handle_and_loop = LFA.get_new()
+    fa_b_handle_and_loop = LFA.get_new()
+
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
         #print(curr_pair)
@@ -59,21 +64,19 @@ def main():
         fa_b.start = {curr_pair[1]}
 
         # Already encountered handle and loop states.
-        fa_a_det_states = {}
-        fa_b_det_states = {}
         fa_ab_det_states = {}
 
         fa_a = fa_a.simple_reduce()
-        fa_a = fa_a.determinize()
+        fa_a = fa_a.determinize_check(fa_a_handle_and_loop)
         #fa_a.print_automaton()
 
         fa_b = fa_b.simple_reduce()
-        fa_b = fa_b.determinize()
+        fa_b = fa_b.determinize_check(fa_b_handle_and_loop)
         #fa_b.print_automaton()
 
-        fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
+        fa_a_formulas_dict = fa_a_handle_and_loop.count_formulas_for_lfa()
         #print(fa_a_formulas_dict)  # DEBUG
-        fa_b_formulas_dict = fa_b.count_formulas_for_lfa()
+        fa_b_formulas_dict = fa_b_handle_and_loop.count_formulas_for_lfa()
         #print(fa_b_formulas_dict)  # DEBUG
 
         satisfiable = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
@@ -87,7 +90,6 @@ def main():
             # When there is only one branch and satisfiable is False, intersection must be empty. Stop generating another states.
         #    break
         elif satisfiable:
-
             # Enqueue the following state(s).
             for initial_state in fa_a.start:
                 enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
