@@ -47,7 +47,7 @@ def main():
 
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
-        print(curr_pair)
+        #print(curr_pair)
 
         fa_a = deepcopy(fa_a_orig)
         fa_b = deepcopy(fa_b_orig)
@@ -72,12 +72,12 @@ def main():
         #fa_b.print_automaton()
 
         fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
-        print(fa_a_formulas_dict)  # DEBUG
+        #print(fa_a_formulas_dict)  # DEBUG
         fa_b_formulas_dict = fa_b.count_formulas_for_lfa()
-        print(fa_b_formulas_dict)  # DEBUG
+        #print(fa_b_formulas_dict)  # DEBUG
 
         satisfiable = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
-        print(satisfiable)
+        #print(satisfiable)
 
         if curr_pair[0] in fa_a_orig.final and curr_pair[1] in fa_b_orig.final and satisfiable:
             # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
@@ -147,8 +147,8 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
 
     fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
     fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
-    print(fa_a_only_formulas)  # DEBUG
-    print(fa_b_only_formulas)  # DEBUG
+    #print(fa_a_only_formulas)  # DEBUG
+    #print(fa_b_only_formulas)  # DEBUG
 
     smt = Solver()
     fa_a_var = Int('fa_a_var')
@@ -161,7 +161,7 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
             smt.add(fa_a_id[0] + fa_a_id[1] * fa_a_var == fa_b_id[0] + fa_b_id[1] * fa_b_var)
 
             if smt.check() == sat:
-                print(smt.model())  # DEBUG
+                #print(smt.model())  # DEBUG
                 return True
 
             smt.pop()
@@ -187,8 +187,8 @@ def change_formulas_variable(formulas_dict, new_var):
 
 
 if __name__ == "__main__":
-    print("Starting resolve_satisfiability.py.")  #DEBUG
+    #print("Starting resolve_satisfiability.py.")  #DEBUG
     main()
-    print("Ending resolve_satisfiability.py.")  #DEBUG
+    #print("Ending resolve_satisfiability.py.")  #DEBUG
 
 # End of file #
