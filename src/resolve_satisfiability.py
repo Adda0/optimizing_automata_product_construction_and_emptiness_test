@@ -109,7 +109,8 @@ def make_pair_states(q_pair_states, q_a_states, q_b_states):
 
     for a_state in q_a_states:
         for b_state in q_b_states:
-            q_pair_states.append([single_pair, a_state, b_state])
+            if [single_pair, a_state, b_state] not in q_pair_states:
+                q_pair_states.append([single_pair, a_state, b_state])
 
     q_a_states.clear()
     q_b_states.clear()
