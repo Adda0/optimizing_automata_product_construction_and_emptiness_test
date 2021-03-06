@@ -64,11 +64,11 @@ def main():
         fa_ab_det_states = {}
 
         fa_a = fa_a.simple_reduce()
-        fa_a = fa_a.determinize_check(fa_a_det_states)
+        fa_a = fa_a.determinize()
         #fa_a.print_automaton()
 
         fa_b = fa_b.simple_reduce()
-        fa_b = fa_b.determinize_check(fa_b_det_states)
+        fa_b = fa_b.determinize()
         #fa_b.print_automaton()
 
         fa_a_formulas_dict = fa_a.count_formulas_for_lfa()
