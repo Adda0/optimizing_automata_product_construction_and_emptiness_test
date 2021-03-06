@@ -91,9 +91,9 @@ def main():
         #    break
         elif satisfiable:
             # Enqueue the following state(s).
-            for initial_state in fa_a.start:
+            for initial_state in fa_a_handle_and_loop.start:
                 enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
-            for initial_state in fa_b.start:
+            for initial_state in fa_b_handle_and_loop.start:
                 enqueue_next_states(q_b_states, fa_b_checked_states, fa_b_orig, initial_state)
 
             make_pair_states(q_pair_states, q_a_states, q_b_states)
