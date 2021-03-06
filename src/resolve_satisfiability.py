@@ -17,7 +17,6 @@ import symboliclib
 #from sa import SA
 from lfa import LFA
 from z3 import *
-from copy import deepcopy
 from collections import deque
 
 
@@ -54,25 +53,15 @@ def main():
         curr_pair = q_pair_states.popleft()
         #print(curr_pair)
 
-        fa_a = deepcopy(fa_a_orig)
-        fa_b = deepcopy(fa_b_orig)
+        fa_a_orig.unify_transition_symbols()
+        fa_b_orig.unify_transition_symbols()
 
-        fa_a.unify_transition_symbols()
-        fa_b.unify_transition_symbols()
+        fa_a_orig.start = {curr_pair[0]}
+        fa_b_orig.start = {curr_pair[1]}
 
-        fa_a.start = {curr_pair[0]}
-        fa_b.start = {curr_pair[1]}
+        fa_a_orig.determinize_check(fa_a_handle_and_loop)
 
-        # Already encountered handle and loop states.
-        fa_ab_det_states = {}
-
-        fa_a = fa_a.simple_reduce()
-        fa_a = fa_a.determinize_check(fa_a_handle_and_loop)
-        #fa_a.print_automaton()
-
-        fa_b = fa_b.simple_reduce()
-        fa_b = fa_b.determinize_check(fa_b_handle_and_loop)
-        #fa_b.print_automaton()
+        fa_b_orig.determinize_check(fa_b_handle_and_loop)
 
         fa_a_formulas_dict = fa_a_handle_and_loop.count_formulas_for_lfa()
         #print(fa_a_formulas_dict)  # DEBUG
