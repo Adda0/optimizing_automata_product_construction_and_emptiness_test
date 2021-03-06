@@ -41,12 +41,7 @@ def main():
         q_b_states.append(initial_state)
 
     # Pair the initial states.
-    for a_state in q_a_states:
-        for b_state in q_b_states:
-            q_pair_states.append([False, a_state, b_state])
-
-    q_a_states.clear()
-    q_b_states.clear()
+    make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, False)
 
 
 
@@ -101,7 +96,7 @@ def main():
                 enqueue_next_states(q_b_states, fa_b_orig, initial_state)
 
             print(q_pair_states)
-            make_pair_states(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
+            make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
             print(q_pair_states)
 
     print("FAILURE: Automata have an empty intersection.")
@@ -109,10 +104,10 @@ def main():
 
 
 
-def make_pair_states(q_pair_states, q_checked_pairs, q_a_states, q_b_states):
-    single_pair = False
-    if len(q_a_states) == 1 and len (q_b_states) == 1:
-        single_pair = True
+def make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, single_pair = None):
+    if single_pair == None:
+        single_pair = True if len(q_a_states) == 1 and len (q_b_states) == 1 else False
+
 
     for a_state in q_a_states:
         for b_state in q_b_states:
