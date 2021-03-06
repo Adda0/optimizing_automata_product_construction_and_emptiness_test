@@ -30,18 +30,13 @@ def main():
     q_a_states = deque()
     q_b_states = deque()
 
-    fa_a_checked_states = []
-    fa_b_checked_states = []
-
     q_pair_states = deque()
 
     # enqueue the initial states
     for initial_state in fa_a_orig.start:
         q_a_states.append(initial_state)
-        #fa_a_checked_states.append(initial_state)
     for initial_state in fa_b_orig.start:
         q_b_states.append(initial_state)
-        #fa_b_checked_states.append(initial_state)
 
     # Pair the initial states.
     make_pair_states(q_pair_states, q_a_states, q_b_states)
@@ -49,27 +44,35 @@ def main():
     fa_a_handle_and_loop = LFA.get_new()
     fa_b_handle_and_loop = LFA.get_new()
 
-    while(q_pair_states):
-        curr_pair = q_pair_states.popleft()
-        print(curr_pair)
+    fa_a_orig.unify_transition_symbols()
+    fa_b_orig.unify_transition_symbols()
 
-        fa_a_orig.unify_transition_symbols()
-        fa_b_orig.unify_transition_symbols()
+    new_pairs_cnt = 0
+
+    while(q_pair_states):
+        if new_pairs_cnt == 1:  # Skip simple ways with only one new state.
+            curr_pair = q_pair_states.pop()
+            print('New skip: ' + str(curr_pair))
+        else:
+            curr_pair = q_pair_states.popleft()
+            print(curr_pair)
 
         fa_a_orig.start = {curr_pair[0]}
         fa_b_orig.start = {curr_pair[1]}
 
-        fa_a_orig.determinize_check(fa_a_handle_and_loop)
 
-        fa_b_orig.determinize_check(fa_b_handle_and_loop)
+        if new_pairs_cnt != 1:
+            fa_a_orig.determinize_check(fa_a_handle_and_loop)
 
-        fa_a_formulas_dict = fa_a_handle_and_loop.count_formulas_for_lfa()
-        print(fa_a_formulas_dict)  # DEBUG
-        fa_b_formulas_dict = fa_b_handle_and_loop.count_formulas_for_lfa()
-        print(fa_b_formulas_dict)  # DEBUG
+            fa_b_orig.determinize_check(fa_b_handle_and_loop)
 
-        satisfiable = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
-        print(satisfiable)
+            fa_a_formulas_dict = fa_a_handle_and_loop.count_formulas_for_lfa()
+            print(fa_a_formulas_dict)  # DEBUG
+            fa_b_formulas_dict = fa_b_handle_and_loop.count_formulas_for_lfa()
+            print(fa_b_formulas_dict)  # DEBUG
+
+            satisfiable = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
+            print(satisfiable)
 
         if curr_pair[0] in fa_a_orig.final and curr_pair[1] in fa_b_orig.final and satisfiable:
             # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
@@ -80,12 +83,14 @@ def main():
         #    break
         elif satisfiable:
             # Enqueue the following state(s).
-            for initial_state in fa_a_handle_and_loop.start:
-                enqueue_next_states(q_a_states, fa_a_checked_states, fa_a_orig, initial_state)
-            for initial_state in fa_b_handle_and_loop.start:
-                enqueue_next_states(q_b_states, fa_b_checked_states, fa_b_orig, initial_state)
+            for initial_state in fa_a_orig.start:
+                enqueue_next_states(q_a_states, fa_a_orig, initial_state)
+            for initial_state in fa_b_orig.start:
+                enqueue_next_states(q_b_states, fa_b_orig, initial_state)
 
-            make_pair_states(q_pair_states, q_a_states, q_b_states)
+            print(q_pair_states)
+            new_pairs_cnt = make_pair_states(q_pair_states, q_a_states, q_b_states)
+            print(q_pair_states)
 
     print("FAILURE: Automata have an empty intersection.")
     exit(1)
@@ -93,28 +98,24 @@ def main():
 
 
 def make_pair_states(q_pair_states, q_a_states, q_b_states):
+    new_pairs_cnt = 0
     for a_state in q_a_states:
         for b_state in q_b_states:
             q_pair_states.append([a_state, b_state])
+            new_pairs_cnt += 1
 
     q_a_states.clear()
     q_b_states.clear()
 
+    return new_pairs_cnt
 
-def enqueue_next_states(q_states, fa_checked_states, fa_orig, curr_state):
+
+def enqueue_next_states(q_states, fa_orig, curr_state):
     transitions = fa_orig.get_deterministic_transitions(curr_state)
 
     for trans_symbol in transitions:
-
-        #transitions[trans_symbol] = ['q1', 'q2', 'q0']  # DEBUG
         for state_dict_elem in transitions[trans_symbol]:
             for state in state_dict_elem.split(','):
-                """
-                if not state in fa_checked_states:
-                    fa_checked_states.append(state)
-                    q_states.append(state)
-                """
-                #fa_checked_states.append(state)
                 q_states.append(state)
 
 def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
