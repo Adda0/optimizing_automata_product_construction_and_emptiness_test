@@ -32,6 +32,8 @@ def main():
 
     q_pair_states = deque()
 
+    q_checked_pairs = {}
+
     # enqueue the initial states
     for initial_state in fa_a_orig.start:
         q_a_states.append(initial_state)
@@ -46,6 +48,8 @@ def main():
     q_a_states.clear()
     q_b_states.clear()
 
+
+
     fa_a_handle_and_loop = LFA.get_new()
     fa_b_handle_and_loop = LFA.get_new()
 
@@ -53,8 +57,11 @@ def main():
     fa_b_orig.unify_transition_symbols()
 
 
+
+
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
+        q_checked_pairs[curr_pair[1] + ',' + curr_pair[2]] = True
         if curr_pair[0]:
             print('New skip: ' + str(curr_pair))
         else:
@@ -94,7 +101,7 @@ def main():
                 enqueue_next_states(q_b_states, fa_b_orig, initial_state)
 
             print(q_pair_states)
-            make_pair_states(q_pair_states, q_a_states, q_b_states)
+            make_pair_states(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
             print(q_pair_states)
 
     print("FAILURE: Automata have an empty intersection.")
@@ -102,15 +109,16 @@ def main():
 
 
 
-def make_pair_states(q_pair_states, q_a_states, q_b_states):
+def make_pair_states(q_pair_states, q_checked_pairs, q_a_states, q_b_states):
     single_pair = False
     if len(q_a_states) == 1 and len (q_b_states) == 1:
         single_pair = True
 
     for a_state in q_a_states:
         for b_state in q_b_states:
-            if [single_pair, a_state, b_state] not in q_pair_states:
+            if a_state + ',' + b_state not in q_checked_pairs and [single_pair, a_state, b_state] not in q_pair_states:
                 q_pair_states.append([single_pair, a_state, b_state])
+                q_checked_pairs[a_state + ',' + b_state] = True
 
     q_a_states.clear()
     q_b_states.clear()
@@ -144,8 +152,8 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
 
     fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
     fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
-    #print(fa_a_only_formulas)  # DEBUG
-    #print(fa_b_only_formulas)  # DEBUG
+    print(fa_a_only_formulas)  # DEBUG
+    print(fa_b_only_formulas)  # DEBUG
 
     smt = Solver()
     fa_a_var = Int('fa_a_var')
