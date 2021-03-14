@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # ====================================================
 # file name: resolve_satisfiability.py
@@ -43,16 +43,11 @@ def main():
     # Pair the initial states.
     make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, False)
 
-
-
     fa_a_handle_and_loop = LFA.get_new()
     fa_b_handle_and_loop = LFA.get_new()
 
     fa_a_orig.unify_transition_symbols()
     fa_b_orig.unify_transition_symbols()
-
-
-
 
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
