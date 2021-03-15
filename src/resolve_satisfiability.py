@@ -14,7 +14,6 @@
 import os
 import sys
 import symboliclib
-#from sa import SA
 from lfa import LFA
 from z3 import *
 from collections import deque
@@ -34,7 +33,7 @@ def main():
 
     q_checked_pairs = {}
 
-    # enqueue the initial states
+    # Enqueue the initial states.
     for initial_state in fa_a_orig.start:
         q_a_states.append(initial_state)
     for initial_state in fa_b_orig.start:
@@ -43,24 +42,30 @@ def main():
     # Pair the initial states.
     make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, False)
 
+    # Generate signle handle and loop automata per original input automaton.
+    # Therefore, only single handle and loop automaton for all of the tested
+    # states in the original automaton is needed.
     fa_a_handle_and_loop = LFA.get_new()
     fa_b_handle_and_loop = LFA.get_new()
 
     fa_a_orig.unify_transition_symbols()
     fa_b_orig.unify_transition_symbols()
 
+    # When there are any pair states to test for satisfiability, test them.
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
         q_checked_pairs[curr_pair[1] + ',' + curr_pair[2]] = True
         if curr_pair[0]:
-            print('New skip: ' + str(curr_pair))
+            print('Skip: ' + str(curr_pair))
         else:
             print(curr_pair)
 
         fa_a_orig.start = {curr_pair[1]}
         fa_b_orig.start = {curr_pair[2]}
 
-
+        # If the current pair is a single pair created from the previous pair,
+        # no need to check for satisfiability.
+        #if True:  # Turn Skip feature off.
         if not curr_pair[0]:
             fa_a_orig.determinize_check(fa_a_handle_and_loop)
 
@@ -82,23 +87,22 @@ def main():
             #fa_b_handle_and_loop.print_automaton()
             print('SUCCESS: Automata have a non-empty intersection.')
             exit(0)
-        #elif not q_pair_states and not satisfiable:
-            # When there is only one branch and satisfiable is False, intersection must be empty. Stop generating another states.
-        #    break
         elif satisfiable:
-            # Enqueue the following state(s).
+            # Enqueue the following state(s), if the previous pair state was satisfiable.
             for initial_state in fa_a_orig.start:
                 enqueue_next_states(q_a_states, fa_a_orig, initial_state)
             for initial_state in fa_b_orig.start:
                 enqueue_next_states(q_b_states, fa_b_orig, initial_state)
 
-            print(q_pair_states)
+            #print(q_pair_states)
+            old_pair_states_len = len(q_pair_states)
             make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
-            print(q_pair_states)
+            pair_states_len_diff = len(q_pair_states) - old_pair_states_len
+            print(pair_states_len_diff)
+            #print(q_pair_states)
 
     print("FAILURE: Automata have an empty intersection.")
     exit(1)
-
 
 def make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, single_pair = None):
     if single_pair == None:
@@ -139,7 +143,6 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
                 only_formulas.append([formulas_dict[accept_state][1]])
 
         return only_formulas
-
 
     fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
     fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
