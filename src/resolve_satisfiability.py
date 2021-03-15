@@ -78,6 +78,8 @@ def main():
 
         if curr_pair[1] in fa_a_orig.final and curr_pair[2] in fa_b_orig.final and satisfiable:
             # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
+            #fa_a_handle_and_loop.print_automaton()
+            #fa_b_handle_and_loop.print_automaton()
             print('SUCCESS: Automata have a non-empty intersection.')
             exit(0)
         #elif not q_pair_states and not satisfiable:
@@ -96,7 +98,6 @@ def main():
 
     print("FAILURE: Automata have an empty intersection.")
     exit(1)
-
 
 
 def make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, single_pair = None):
@@ -142,8 +143,8 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
 
     fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
     fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
-    print(fa_a_only_formulas)  # DEBUG
-    print(fa_b_only_formulas)  # DEBUG
+    #print(fa_a_only_formulas)  # DEBUG
+    #print(fa_b_only_formulas)  # DEBUG
 
     smt = Solver()
     fa_a_var = Int('fa_a_var')
@@ -164,26 +165,9 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
     return False
 
 
-def change_formulas_variable(formulas_dict, new_var):
-    """
-    OBSOLETE
-    Change variable symbol in formulas for handle and loop automaton.
-    :param formulas_dict: Dictionary with formulas for handle and loop automaton
-    :param new_var: variable symbol to use instead of the former variable symbol
-    :return: formulas dictionary with new variable symbol instead
-    """
-
-    for accept_state in formulas_dict:
-            for c in formulas_dict[accept_state][1]:
-                if c.isalpha():
-                    formulas_dict[accept_state][1] = formulas_dict[accept_state][1].replace(c, new_var)
-
-    return formulas_dict
-
-
 if __name__ == "__main__":
-    print("Starting resolve_satisfiability.py.")  #DEBUG
+    #print("Starting resolve_satisfiability.py.")  #DEBUG
     main()
-    print("Ending resolve_satisfiability.py.")  #DEBUG
+    #print("Ending resolve_satisfiability.py.")  #DEBUG
 
 # End of file #
