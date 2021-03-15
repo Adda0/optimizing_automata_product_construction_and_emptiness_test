@@ -102,7 +102,7 @@ def main():
 
 def make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, single_pair = None):
     if single_pair == None:
-        single_pair = True if len(q_a_states) == 1 and len (q_b_states) == 1 else False
+        single_pair = True if (len(q_a_states) == 1 and len(q_b_states) == 1) else False
 
 
     for a_state in q_a_states:
