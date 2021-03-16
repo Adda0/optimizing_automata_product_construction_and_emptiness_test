@@ -30,6 +30,7 @@ def main():
     q_b_states = deque()
 
     q_pair_states = deque()
+    processed_pair_states_cnt = 0
 
     q_checked_pairs = {}
 
@@ -54,6 +55,8 @@ def main():
     # When there are any pair states to test for satisfiability, test them.
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
+        processed_pair_states_cnt += 1
+
         q_checked_pairs[curr_pair[1] + ',' + curr_pair[2]] = True
         if curr_pair[0]:
             print('Skip: ' + str(curr_pair))
@@ -68,7 +71,6 @@ def main():
         #if True:  # Turn Skip feature off.
         if not curr_pair[0]:
             fa_a_orig.determinize_check(fa_a_handle_and_loop)
-
             fa_b_orig.determinize_check(fa_b_handle_and_loop)
 
             fa_a_formulas_dict = fa_a_handle_and_loop.count_formulas_for_lfa()
@@ -85,7 +87,14 @@ def main():
             # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
             #fa_a_handle_and_loop.print_automaton()
             #fa_b_handle_and_loop.print_automaton()
+            print(f"handle and loop a: {len(fa_a_handle_and_loop.states)}")
+            print(f"handle and loop b: {len(fa_b_handle_and_loop.states)}")
+            print(f"States checked: {len(q_checked_pairs)}")
+            print(f"States processed: {processed_pair_states_cnt}")
             print('SUCCESS: Automata have a non-empty intersection.')
+            orig_a = symboliclib.parse(fa_a_name)
+            orig_b = symboliclib.parse(fa_b_name)
+            intersect = orig_a.intersection_count(orig_b)
             exit(0)
         elif satisfiable:
             # Enqueue the following state(s), if the previous pair state was satisfiable.
@@ -101,6 +110,10 @@ def main():
             print(pair_states_len_diff)
             #print(q_pair_states)
 
+    print(len(fa_a_handle_and_loop.states))
+    print(len(fa_b_handle_and_loop.states))
+    print(len(q_checked_pairs))
+    print(processed_pair_states_cnt)
     print("FAILURE: Automata have an empty intersection.")
     exit(1)
 
