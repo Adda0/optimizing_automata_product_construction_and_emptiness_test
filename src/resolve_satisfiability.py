@@ -48,20 +48,23 @@ def main():
     # states in the original automaton is needed.
     fa_a_handle_and_loop = LFA.get_new()
     fa_b_handle_and_loop = LFA.get_new()
+    intersect_ab = LFA.get_new()
 
     fa_a_orig.unify_transition_symbols()
     fa_b_orig.unify_transition_symbols()
 
+    found = False
+    skipped_cnt = 0
+
     # When there are any pair states to test for satisfiability, test them.
     while(q_pair_states):
         curr_pair = q_pair_states.popleft()
-        processed_pair_states_cnt += 1
 
         q_checked_pairs[curr_pair[1] + ',' + curr_pair[2]] = True
-        if curr_pair[0]:
-            print('Skip: ' + str(curr_pair))
-        else:
-            print(curr_pair)
+        #if curr_pair[0]:
+        #    print('Skip: ' + str(curr_pair))
+        #else:
+        #    print(curr_pair)
 
         fa_a_orig.start = {curr_pair[1]}
         fa_b_orig.start = {curr_pair[2]}
@@ -70,6 +73,7 @@ def main():
         # no need to check for satisfiability.
         #if True:  # Turn Skip feature off.
         if not curr_pair[0]:
+            processed_pair_states_cnt += 1
             fa_a_orig.determinize_check(fa_a_handle_and_loop)
             fa_b_orig.determinize_check(fa_b_handle_and_loop)
 
@@ -79,43 +83,61 @@ def main():
             #print(fa_b_formulas_dict)  # DEBUG
 
             satisfiable = check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict)
-            print(satisfiable)
+            #print(satisfiable)
         else:
             satisfiable = True
+            skipped_cnt += 1
 
-        if curr_pair[1] in fa_a_orig.final and curr_pair[2] in fa_b_orig.final and satisfiable:
-            # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
-            #fa_a_handle_and_loop.print_automaton()
-            #fa_b_handle_and_loop.print_automaton()
-            print(f"handle and loop a: {len(fa_a_handle_and_loop.states)}")
-            print(f"handle and loop b: {len(fa_b_handle_and_loop.states)}")
-            print(f"States checked: {len(q_checked_pairs)}")
-            print(f"States processed: {processed_pair_states_cnt}")
-            print('SUCCESS: Automata have a non-empty intersection.')
-            orig_a = symboliclib.parse(fa_a_name)
-            orig_b = symboliclib.parse(fa_b_name)
-            intersect = orig_a.intersection_count(orig_b)
-            exit(0)
-        elif satisfiable:
-            # Enqueue the following state(s), if the previous pair state was satisfiable.
-            for initial_state in fa_a_orig.start:
-                enqueue_next_states(q_a_states, fa_a_orig, initial_state)
-            for initial_state in fa_b_orig.start:
-                enqueue_next_states(q_b_states, fa_b_orig, initial_state)
+        if satisfiable:
+            intersect_ab.states.add(curr_pair[1] + ',' + curr_pair[2])
 
-            #print(q_pair_states)
-            old_pair_states_len = len(q_pair_states)
-            make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
-            pair_states_len_diff = len(q_pair_states) - old_pair_states_len
-            print(pair_states_len_diff)
-            #print(q_pair_states)
+            if curr_pair[1] in fa_a_orig.final and curr_pair[2] in fa_b_orig.final:
+                # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
+                #fa_a_handle_and_loop.print_automaton()
+                #fa_b_handle_and_loop.print_automaton()
+                intersect_ab.final.add(curr_pair[1] + ',' + curr_pair[2])
+                print(f"handle and loop a: {len(fa_a_handle_and_loop.states)}")
+                print(f"handle and loop b: {len(fa_b_handle_and_loop.states)}")
+                print(f"States checked: {len(q_checked_pairs)}")
+                print(f"States processed: {processed_pair_states_cnt}")
+                print('SUCCESS: Automata have a non-empty intersection.')
+                found = True
+                #break
+            else:
+                # Enqueue the following state(s), if the previous pair state was satisfiable.
+                for initial_state in fa_a_orig.start:
+                    enqueue_next_states(q_a_states, fa_a_orig, initial_state)
+                for initial_state in fa_b_orig.start:
+                    enqueue_next_states(q_b_states, fa_b_orig, initial_state)
 
-    print(len(fa_a_handle_and_loop.states))
-    print(len(fa_b_handle_and_loop.states))
-    print(len(q_checked_pairs))
-    print(processed_pair_states_cnt)
-    print("FAILURE: Automata have an empty intersection.")
-    exit(1)
+                #print(q_pair_states)
+                old_pair_states_len = len(q_pair_states)
+                make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
+                pair_states_len_diff = len(q_pair_states) - old_pair_states_len
+                #print(pair_states_len_diff)
+                #print(q_pair_states)
+
+    print(f"Intersect_ab: {len(intersect_ab.states)}")
+    print(f"Intersect_ab final: {len(intersect_ab.final)}")
+    print(f"Skipped: {skipped_cnt}")
+    #intersect_ab = intersect_ab.simple_reduce()
+    #print(f"Intersect_ab sr: {len(intersect_ab.states)}")
+    #print(f"Intersect_ab sr final: {len(intersect_ab.final)}")
+    orig_a = symboliclib.parse(fa_a_name)
+    orig_b = symboliclib.parse(fa_b_name)
+    orig_a.unify_transition_symbols()
+    orig_b.unify_transition_symbols()
+    print(f"A states: {len(orig_a.states)}")
+    print(f"B states: {len(orig_b.states)}")
+    intersect = orig_a.intersection_count(orig_b)
+
+    if not found:
+        print(f"handle and loop a: {len(fa_a_handle_and_loop.states)}")
+        print(f"handle and loop b: {len(fa_b_handle_and_loop.states)}")
+        print(f"States checked: {len(q_checked_pairs)}")
+        print(f"States processed: {processed_pair_states_cnt}")
+        print("FAILURE: Automata have an empty intersection.")
+        exit(1)
 
 def make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states, single_pair = None):
     if single_pair == None:
