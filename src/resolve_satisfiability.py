@@ -59,7 +59,8 @@ def main():
 
     # When there are any pair states to test for satisfiability, test them.
     while(q_pair_states):
-        curr_pair = q_pair_states.popleft()
+        #curr_pair = q_pair_states.popleft()
+        curr_pair = q_pair_states.pop()
 
         q_checked_pairs[curr_pair[1] + ',' + curr_pair[2]] = True
         #if curr_pair[0]:
