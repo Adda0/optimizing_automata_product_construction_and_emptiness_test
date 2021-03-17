@@ -55,6 +55,7 @@ def main():
 
     found = False
     skipped_cnt = 0
+    false_cnt = 0
 
     # When there are any pair states to test for satisfiability, test them.
     while(q_pair_states):
@@ -116,10 +117,13 @@ def main():
                 pair_states_len_diff = len(q_pair_states) - old_pair_states_len
                 #print(pair_states_len_diff)
                 #print(q_pair_states)
+        else:
+            false_cnt += 1
 
     print(f"Intersect_ab: {len(intersect_ab.states)}")
     print(f"Intersect_ab final: {len(intersect_ab.final)}")
     print(f"Skipped: {skipped_cnt}")
+    print(f"False cnt: {false_cnt}")
     #intersect_ab = intersect_ab.simple_reduce()
     #print(f"Intersect_ab sr: {len(intersect_ab.states)}")
     #print(f"Intersect_ab sr final: {len(intersect_ab.final)}")
