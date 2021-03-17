@@ -105,19 +105,19 @@ def main():
                 print('SUCCESS: Automata have a non-empty intersection.')
                 found = True
                 #break
-            else:
-                # Enqueue the following state(s), if the previous pair state was satisfiable.
-                for initial_state in fa_a_orig.start:
-                    enqueue_next_states(q_a_states, fa_a_orig, initial_state)
-                for initial_state in fa_b_orig.start:
-                    enqueue_next_states(q_b_states, fa_b_orig, initial_state)
 
-                #print(q_pair_states)
-                old_pair_states_len = len(q_pair_states)
-                make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
-                pair_states_len_diff = len(q_pair_states) - old_pair_states_len
-                #print(pair_states_len_diff)
-                #print(q_pair_states)
+            # Enqueue the following state(s), if the previous pair state was satisfiable.
+            for initial_state in fa_a_orig.start:
+                enqueue_next_states(q_a_states, fa_a_orig, initial_state)
+            for initial_state in fa_b_orig.start:
+                enqueue_next_states(q_b_states, fa_b_orig, initial_state)
+
+            #print(q_pair_states)
+            old_pair_states_len = len(q_pair_states)
+            make_pairs(q_pair_states, q_checked_pairs, q_a_states, q_b_states)
+            pair_states_len_diff = len(q_pair_states) - old_pair_states_len
+            #print(pair_states_len_diff)
+            #print(q_pair_states)
         else:
             false_cnt += 1
 
