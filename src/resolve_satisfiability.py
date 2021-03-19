@@ -57,7 +57,7 @@ def main():
     intersect_ab = LFA.get_new()
 
     fa_a_unified = deepcopy(fa_a_orig)
-    fa_b_unified = deepcopy(fa_a_orig)
+    fa_b_unified = deepcopy(fa_b_orig)
 
     fa_a_unified.unify_transition_symbols()
     fa_b_unified.unify_transition_symbols()
@@ -118,16 +118,10 @@ def main():
                 print(sat_cnt, end=' ')
                 print(false_cnt, end=' ')
                 print(skipped_cnt, end = ' ')
-                #print(f"handle and loop a: {len(fa_a_handle_and_loop.states)}")
-                #print(f"handle and loop b: {len(fa_b_handle_and_loop.states)}")
+                print(len(fa_a_handle_and_loop.states), end=' ')
+                print(len(fa_b_handle_and_loop.states), end=' ')
                 found = True
                 #break
-
-            # Enqueue the following state(s), if the previous pair state was satisfiable.
-            #for initial_state in fa_a_unified.start:
-            #    enqueue_next_states(q_a_states, fa_a_unified, initial_state)
-            #for initial_state in fa_b_unified.start:
-            #    enqueue_next_states(q_b_states, fa_b_unified, initial_state)
 
             #print(q_pair_states)
             old_pair_states_len = len(q_pair_states)
@@ -159,6 +153,8 @@ def main():
     print(sat_cnt, end=' ')
     print(false_cnt, end=' ')
     print(skipped_cnt, end = ' ')
+    print(len(fa_a_handle_and_loop.states), end=' ')
+    print(len(fa_b_handle_and_loop.states), end=' ')
     print(len(intersect_ab.states),  end=' ')
     print(len(intersect_ab.final), end=' ')
 
@@ -200,7 +196,9 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, curr_state,
                     #endstate = [endstate[0], endstate[1]]
 
                     if end_str not in q_checked_pairs and [endstate[0], endstate[1], True] not in q_pair_states and [endstate[0], endstate[1], False] not in q_pair_states:  #! check format invalid
+                        new_pairs.append(endstate)
                         q_checked_pairs[endstate[0] + ',' + endstate[1]] = True
+
     if len(new_pairs) == 1:
         single_pair = True
     for new_pair in new_pairs:
