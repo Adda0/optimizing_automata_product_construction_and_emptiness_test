@@ -22,14 +22,23 @@ import itertools
 
 # Main script function
 def main():
-    for break_when_final in [True, False]:
-        fa_a_name = sys.argv[1]
-        fa_b_name = sys.argv[2]
-        fa_a_orig = symboliclib.parse(fa_a_name)
-        fa_b_orig = symboliclib.parse(fa_b_name)
+    fa_a_name = sys.argv[1]
+    fa_b_name = sys.argv[2]
 
-        print(len(fa_a_orig.states), end=' ')
-        print(len(fa_b_orig.states), end=' ')
+    fa_a_orig = symboliclib.parse(fa_a_name)
+    fa_b_orig = symboliclib.parse(fa_b_name)
+    A_larger = True
+
+    for break_when_final in [True, False]:
+
+        if len(fa_a_orig.states) > len(fa_b_orig.states):
+            print(len(fa_a_orig.states), end=' ')
+            print(len(fa_b_orig.states), end=' ')
+        else:
+            A_larger = False
+            print(len(fa_b_orig.states), end=' ')
+            print(len(fa_a_orig.states), end=' ')
+
         #print(len(fa_a_orig.states) * len(fa_b_orig.states), end=' ')
 
         q_a_states = deque()
@@ -108,6 +117,7 @@ def main():
 
             if satisfiable:
                 intersect_ab.states.add(curr_pair[0] + ',' + curr_pair[1])
+                #print(len(intersect_ab.states))
 
                 if curr_pair[0] in fa_a_orig.final and curr_pair[1] in fa_b_orig.final:
                     # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
@@ -168,23 +178,30 @@ def main():
         print(sat_cnt, end=' ')
         print(false_cnt, end=' ')
         print(skipped_cnt, end = ' ')
-        print(len(fa_a_handle_and_loop.states), end=' ')
-        print(len(fa_b_handle_and_loop.states), end=' ')
+        if A_larger:
+            print(len(fa_a_handle_and_loop.states), end=' ')
+            print(len(fa_b_handle_and_loop.states), end=' ')
+        else:
+            print(len(fa_b_handle_and_loop.states), end=' ')
+            print(len(fa_a_handle_and_loop.states), end=' ')
         print(len(intersect_ab.states),  end=' ')
         print(len(intersect_ab.final), end=' ')
         #intersect_ab.print_automaton()
-        print(intersect_ab.final)
+        #print(intersect_ab.final)
 
 
-        orig_a = symboliclib.parse(fa_a_name)
-        orig_b = symboliclib.parse(fa_b_name)
+        #orig_a = symboliclib.parse(fa_a_name)
+        #orig_b = symboliclib.parse(fa_b_name)
+        orig_a = fa_a_orig
+        orig_b = fa_b_orig
         #orig_a.unify_transition_symbols()
         #orig_b.unify_transition_symbols()
         #print(f"A states: {len(orig_a.states)}")
         #print(f"B states: {len(orig_b.states)}")
         intersect = orig_a.intersection_count(orig_b, break_when_final)
         #intersect.print_automaton()
-        print(intersect.final)
+        print()
+        #print(intersect.final)
         #intersect_ab = intersect_ab.simple_reduce()
         #print(f"Intersect_ab sr: {len(intersect_ab.states)}")
         #print(f"Intersect_ab sr final: {len(intersect_ab.final)}")
