@@ -55,10 +55,6 @@ def main():
                 q_pair_states.append([a_initial_state, b_initial_state, False])
 
 
-
-        # Pair the initial states.  #! TODO
-        #make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, , False)
-
         # Generate signle handle and loop automata per original input automaton.
         # Therefore, only single handle and loop automaton for all of the tested
         # states in the original automaton is needed.
@@ -188,6 +184,8 @@ def main():
         print(len(intersect_ab.final), end=' ')
         #intersect_ab.print_automaton()
         #print(intersect_ab.final)
+        fa_a_handle_and_loop.print_automaton()
+        fa_b_handle_and_loop.print_automaton()
 
 
         #orig_a = symboliclib.parse(fa_a_name)
@@ -230,14 +228,25 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, curr_state,
                     end_str = endstate[0] + ',' + endstate[1]
                     #endstate = [endstate[0], endstate[1]]
 
-                    if end_str not in q_checked_pairs and [endstate[0], endstate[1], True] not in q_pair_states and [endstate[0], endstate[1], False] not in q_pair_states:  #! check format invalid
-                        new_pairs.append(endstate)
-                        q_checked_pairs[endstate[0] + ',' + endstate[1]] = True
+                    new_pairs.append(endstate)
 
+
+    # If only single new product state was generated, set this state as skippable.
     if len(new_pairs) == 1:
         single_pair = True
+
+    # Append new product states to work set, optionally update the work set elements.
     for new_pair in new_pairs:
-        q_pair_states.append([new_pair[0], new_pair[1], single_pair])
+        # Add state to checked states.
+        q_checked_pairs[new_pair[0] + ',' + new_pair[1]] = True
+
+        if [new_pair[0], new_pair[1], True] in q_pair_states:
+            pass
+        elif [new_pair[0], new_pair[1], False] in q_pair_states and single_pair:
+            id = q_pair_states.index([new_pair[0], new_pair[1], False])
+            q_pair_states[id][2] = True
+        else:
+            q_pair_states.append([new_pair[0], new_pair[1], single_pair])
 
 def enqueue_next_states(q_states, fa_orig, curr_state):
     transitions = fa_orig.get_deterministic_transitions(curr_state)
