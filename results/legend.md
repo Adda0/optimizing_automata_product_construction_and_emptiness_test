@@ -1,0 +1,29 @@
+# Legend
+- **Automaton A**
+    - The amount of states in the first original automaton A. (We have made sure this automaton is always larger than the second one – only for consistency purposes of this table.)
+- **Automaton B**
+    - The amount of states in the second original automaton.
+- **Sum of A and B States**
+    - The total amount of states in both the original automaton.
+- **Checked**
+    - The amount of states our optimization was prepared to test. It corresponds to the amount of unique states in the work set throughout the whole process of optimization.
+- **Processed**
+    - The amount of states we had to process. Meaning computing the handle and loop automata, compute accepted word lengths and execute SMT solver satisfiability check.
+- **Satisfiable**
+    - How many of the Processed states were satisfiable.
+- **Unsatisfiable**
+    - How many of the Processed states were unsatisfiable.
+- **Skipped**
+    - How many of the Checked states we could skip with satisfiable result without testing for satisfiability using SMT solver and handle and loop automata.
+- **Handle and Loop A**
+    - The amount of states in the final handle and loop automaton for the first automaton A.
+- **Handle and Loop B**
+    - The amount of states in the final handle and loop automaton for the second automaton A.
+- **Product Optimized**
+    - The amount of the generated states in the finial product automaton using our optimized algorithm.
+- **Product Basic**
+    - The amount of the generated states in the finial product automaton using the basic product construction algorithm. Used for sorting the results in the graphs.
+- **Product Final States**
+    - The amount of final states in the generated product. Always between 0 and 1 for the emptiness test, possibly higher for the full product construction.
+- **Spared state space**
+    - The amount of states (the state space) spared by using our algorithm instead of the basic product construction algorithm.
