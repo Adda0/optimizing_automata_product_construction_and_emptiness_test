@@ -29,26 +29,28 @@ def main():
     fa_b_orig = symboliclib.parse(fa_b_name)
     A_larger = True
 
+    # Print sizes of original automata.
+    if len(fa_a_orig.states) > len(fa_b_orig.states):
+        print(len(fa_a_orig.states), end=' ')
+        print(len(fa_b_orig.states), end=' ')
+    else:
+        A_larger = False
+        print(len(fa_b_orig.states), end=' ')
+        print(len(fa_a_orig.states), end=' ')
+
+    # Run twice – once for emptiness test (break_when_final == True) and
+    # once for full product construction (break_when_final == False).
     for break_when_final in [True, False]:
-
-        if len(fa_a_orig.states) > len(fa_b_orig.states):
-            print(len(fa_a_orig.states), end=' ')
-            print(len(fa_b_orig.states), end=' ')
-        else:
-            A_larger = False
-            print(len(fa_b_orig.states), end=' ')
-            print(len(fa_a_orig.states), end=' ')
-
         #print(len(fa_a_orig.states) * len(fa_b_orig.states), end=' ')
 
         q_a_states = deque()
         q_b_states = deque()
 
-        #q_pair_states = deque()
         processed_pair_states_cnt = 0
 
         q_checked_pairs = {}
         q_pair_states = deque()
+
         # Enqueue the initial states.
         for a_initial_state in fa_a_orig.start:
             for b_initial_state in fa_b_orig.start:
@@ -184,8 +186,8 @@ def main():
         print(len(intersect_ab.final), end=' ')
         #intersect_ab.print_automaton()
         #print(intersect_ab.final)
-        fa_a_handle_and_loop.print_automaton()
-        fa_b_handle_and_loop.print_automaton()
+        #fa_a_handle_and_loop.print_automaton()
+        #fa_b_handle_and_loop.print_automaton()
 
 
         #orig_a = symboliclib.parse(fa_a_name)
@@ -227,11 +229,11 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, curr_state,
 
                     end_str = endstate[0] + ',' + endstate[1]
                     #endstate = [endstate[0], endstate[1]]
+                    if end_str not in q_checked_pairs:
+                        new_pairs.append(endstate)
 
-                    new_pairs.append(endstate)
 
-
-    # If only single new product state was generated, set this state as skippable.
+    # If only a single new product state was generated, set this state as skippable.
     if len(new_pairs) == 1:
         single_pair = True
 
