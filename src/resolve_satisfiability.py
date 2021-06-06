@@ -299,8 +299,6 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
 
 
 if __name__ == "__main__":
-    #print("Starting resolve_satisfiability.py.")  #DEBUG
     main()
-    #print("Ending resolve_satisfiability.py.")  #DEBUG
 
-# End of file #
+# End of file.
