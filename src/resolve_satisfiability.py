@@ -77,10 +77,11 @@ def main():
 
         # When there are any pair states to test for satisfiability, test them.
         while q_pair_states:
-            #curr_pair = q_pair_states.popleft()
-            curr_pair = q_pair_states.pop()
+            #curr_pair = q_pair_states.popleft()  # BFS
+            curr_pair = q_pair_states.pop()  # DFS
 
             q_checked_pairs[curr_pair[0] + ',' + curr_pair[1]] = True
+            # DEBUG:
             #if curr_pair[0]:
             #    print('Skip: ' + str(curr_pair))
             #else:
@@ -115,7 +116,7 @@ def main():
 
             if satisfiable:
                 intersect_ab.states.add(curr_pair[0] + ',' + curr_pair[1])
-                #print(len(intersect_ab.states))
+                #print(len(intersect_ab.states))  # Debug
 
                 if curr_pair[0] in fa_a_orig.final and curr_pair[1] in fa_b_orig.final:
                     # Automata have a non-empty intersection. We can end the testing here as we have found a solution.
@@ -260,24 +261,24 @@ def enqueue_next_states(q_states, fa_orig, curr_state):
 
 def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
     """
-    Check satisfiable for formulas using SMT solver Z3.
-    :param fa_a_formulas_dict: Dictionary with formulas for FA A.
-    :param fa_b_formulas_dict: Dictionary with formulas for FA B.
+    Check satisfiability for formulae using SMT solver Z3.
+    :param fa_a_formulas_dict: Dictionary with formulae for FA A.
+    :param fa_b_formulas_dict: Dictionary with formulae for FA B.
     :return: True if satisfiable; False if not satisfiable.
     """
 
-    def get_only_formulas(formulas_dict):
-        only_formulas = []
+    def get_only_formulae(formulas_dict):
+        only_formulae = []
         for accept_state in formulas_dict:
             try:
-                only_formulas.append([formulas_dict[accept_state][1], formulas_dict[accept_state][2]])
+                only_formulae.append([formulas_dict[accept_state][1], formulas_dict[accept_state][2]])
             except IndexError:
-                only_formulas.append([formulas_dict[accept_state][1]])
+                only_formulae.append([formulas_dict[accept_state][1]])
 
-        return only_formulas
+        return only_formulae
 
-    fa_a_only_formulas = get_only_formulas(fa_a_formulas_dict)
-    fa_b_only_formulas = get_only_formulas(fa_b_formulas_dict)
+    fa_a_only_formulae = get_only_formulae(fa_a_formulas_dict)
+    fa_b_only_formulae = get_only_formulae(fa_b_formulas_dict)
     #print(fa_a_only_formulas)  # DEBUG
     #print(fa_b_only_formulas)  # DEBUG
 
@@ -285,8 +286,8 @@ def check_satisfiability(fa_a_formulas_dict, fa_b_formulas_dict):
     fa_a_var = Int('fa_a_var')
     fa_b_var = Int('fa_b_var')
 
-    for fa_a_id in fa_a_only_formulas:
-        for fa_b_id in fa_b_only_formulas:
+    for fa_a_id in fa_a_only_formulae:
+        for fa_b_id in fa_b_only_formulae:
             smt.push()
             smt.add(fa_a_var >= 0, fa_b_var >= 0)
             smt.add(fa_a_id[0] + fa_a_id[1] * fa_a_var == fa_b_id[0] + fa_b_id[1] * fa_b_var)
