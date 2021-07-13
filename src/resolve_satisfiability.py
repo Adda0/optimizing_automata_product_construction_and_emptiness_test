@@ -20,7 +20,7 @@ from collections import deque
 from copy import deepcopy
 import itertools
 
-# Main script function
+# Main script function.
 def main():
     fa_a_name = sys.argv[1]
     fa_b_name = sys.argv[2]
@@ -261,45 +261,43 @@ def enqueue_next_states(q_states, fa_orig, curr_state):
             for state in state_dict_elem.split(','):
                 q_states.append(state)
 
-def check_satisfiability(fa_a_formulae_dict, fa_b_formulae_dict):
+
+def check_satisfiability(fa_a, fa_b):
     """
-    Check satisfiability for formulae using SMT solver Z3.
-    :param fa_a_formulae_dict: Dictionary with formulae for FA A.
-    :param fa_b_formulae_dict: Dictionary with formulae for FA B.
+    Check satisfiability for Parikh image using SMT solver Z3.
+    :param fa_a: First automaton.
+    :param fa_b: Second automaton.
     :return: True if satisfiable; False if not satisfiable.
     """
 
-    def get_only_formulae(formulae_dict):
-        only_formulae = []
-        for accept_state in formulae_dict:
-            try:
-                only_formulae.append([formulae_dict[accept_state][1], formulae_dict[accept_state][2]])
-            except IndexError:
-                only_formulae.append([formulae_dict[accept_state][1]])
-
-        return only_formulae
-
-    fa_a_only_formulae = get_only_formulae(fa_a_formulae_dict)
-    fa_b_only_formulae = get_only_formulae(fa_b_formulae_dict)
-    #print(fa_a_only_formulae)  # DEBUG
-    #print(fa_b_only_formulae)  # DEBUG
-
     smt = Solver()
-    fa_a_var = Int('fa_a_var')
-    fa_b_var = Int('fa_b_var')
+    # Create lists of variables for conjunction of formulae.
+    y_t_a = [ Int('y_a_%s' % i) for i in range( len(fa_a.transitions) ) ]  # FA A: y_t.
+    u_q_a = [ Int('u_a_%s' % i) for i in range( len(fa_a.states) ) ]  # FA A: u_q.
 
-    for fa_a_id in fa_a_only_formulae:
-        for fa_b_id in fa_b_only_formulae:
-            smt.push()
-            smt.add(fa_a_var >= 0, fa_b_var >= 0)
-            smt.add(fa_a_id[0] + fa_a_id[1] * fa_a_var == fa_b_id[0] + fa_b_id[1] * fa_b_var)
+    smt.push()
+    # Add clauses – conjunction of formulae.
 
-            if smt.check() == sat:
-                #print(smt.model())  # DEBUG
-                return True
+    # Constraints for 'u_q'.
+    for i, state in enumerate(fa_a.states):
+        if state in fa_a.start:
+            smt.add(u_q_a[i] = 1)
+        else if state in fa_a.final:
+            smt.add(u_q_a[i] = -1)  #? TODO what about 'or u_q_a[i] = -0'?
+        else:
+            smt.add(u_q_a[i] = 0)
 
-            smt.pop()
+    smt.add()  # FA A: First conjunct.
+    smt.add( And( [ y_t_a[i] >= 0 for i in range( len(fa_a.transitions) ) ] ))  # FA A: Second conjunct.
+    smt.add()  # FA A: Third conjunct.
+    smt.add()  # FA A: Forth conjunct.
 
+
+
+    if smt.check() == sat:
+        #print(smt.model())  # DEBUG
+        return True
+    smt.pop()
     return False
 
 
