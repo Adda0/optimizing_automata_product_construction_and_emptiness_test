@@ -229,8 +229,10 @@ def check_satisfiability(fa_a, fa_b):
     #! FIXME what if initial state is also a final state?
     # TMP FIX:
     if next(iter(fa_a.start)) in fa_a.final:
+        print("quick true")
         return True
     if next(iter(fa_b.start)) in fa_b.final:
+        print("quick true")
         return True
 
     smt = Solver()
@@ -248,7 +250,7 @@ def check_satisfiability(fa_a, fa_b):
 
     # FA B variables.
 
-    smt.push()
+    #smt.push()
     # Add clauses – conjunction of formulae.
 
     # Constraints for 'u_q'.
@@ -320,10 +322,12 @@ def check_satisfiability(fa_a, fa_b):
     # Check for satisfiability.
     if smt.check() == sat:
         #print(smt.model())
-        smt.pop()
+        print("true")
+        #smt.pop()
         return True
 
-    smt.pop()
+    #smt.pop()
+    print("false")
     return False
 
 
