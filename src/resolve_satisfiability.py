@@ -215,6 +215,7 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, curr_state,
     b_state = curr_state[1]
 
     new_pairs = deque()
+    new_pairs_cnt = 0
 
     if a_state in fa_a_orig.transitions and b_state in fa_b_orig.transitions:
         for label in fa_a_orig.transitions[a_state]:
@@ -230,12 +231,13 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, curr_state,
 
                     end_str = endstate[0] + ',' + endstate[1]
                     #endstate = [endstate[0], endstate[1]]
+                    new_pairs_cnt += 1
                     if end_str not in q_checked_pairs:
                         new_pairs.append(endstate)
 
 
     # If only a single new product state was generated, set this state as skippable.
-    if len(new_pairs) == 1:
+    if new_pairs_cnt == 1:
         single_pair = True
 
     # Append new product states to work set, optionally update the work set elements.
