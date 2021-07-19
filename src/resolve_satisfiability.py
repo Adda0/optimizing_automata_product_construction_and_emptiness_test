@@ -25,8 +25,8 @@ def main():
     fa_a_name = sys.argv[1]
     fa_b_name = sys.argv[2]
 
-    fa_a_orig = symboliclib.parse(fa_a_name).reverse_complete()
-    fa_b_orig = symboliclib.parse(fa_b_name).reverse_complete()
+    fa_a_orig = symboliclib.parse(fa_a_name)
+    fa_b_orig = symboliclib.parse(fa_b_name)
 
     # Decide which automaton is bigger.
     A_larger = True
@@ -59,6 +59,25 @@ def main():
         fa_b_orig.transitions[final_state][abstract_final_symbol] = [abstract_final_state]
     fa_b_orig.final = set([abstract_final_state])
 
+    # Add one unified initial state.
+    abstract_initial_symbol = 'abstract_initial_symbol'
+    abstract_initial_state = 'abstract_inital_state'
+
+    fa_a_orig.alphabet.add(abstract_initial_symbol)
+    fa_b_orig.alphabet.add(abstract_initial_symbol)
+
+    fa_a_orig.states.add(abstract_initial_state)
+    fa_a_orig.transitions[abstract_initial_state] = {}
+    for initial_state in fa_a_orig.start:
+        fa_a_orig.transitions[abstract_initial_state][abstract_initial_symbol] = [initial_state]
+    fa_a_orig.start = set([abstract_initial_state])
+
+    fa_b_orig.states.add(abstract_initial_state)
+    fa_b_orig.transitions[abstract_initial_state] = {}
+    for initial_state in fa_b_orig.start:
+        fa_b_orig.transitions[abstract_initial_state][abstract_initial_symbol] = [initial_state]
+    fa_b_orig.start = set([abstract_initial_state])
+
     # DEBUG
     #print(fa_a_orig.alphabet)
     #print(fa_b_orig.alphabet)
@@ -69,10 +88,18 @@ def main():
     #print(fa_a_orig.transitions)
     #print(fa_b_orig.transitions)
 
+
+    fa_a_orig_reversed = fa_a_orig.reverse()
+    fa_b_orig_reversed = fa_b_orig.reverse()
+
+
+    fa_a_copy = fa_a_orig.reverse_complete(True)
+    fa_b_copy = fa_b_orig.reverse_complete(True)
+
     # Run only once – once for emptiness test (break_when_final == True)
     #  and then continue with full product construction (break_when_final == False).
     for break_when_final in [True]:
-        #print(len(fa_a_orig.states) * len(fa_b_orig.states), end=' ')
+        #print(len(fa_a_copy.states) * len(fa_b_copy.states), end=' ')
         processed_pair_states_cnt = 0
 
 
@@ -80,23 +107,23 @@ def main():
         smt = Solver()
         # Add persistent formulae valid for every product-state.
         # Create lists of variables for conjunction of formulae.
-        hash_phi = [ Int('hash_%s' % symbol) for symbol in fa_a_orig.alphabet ]  # Both FA A and FA B: hash_phi.
+        hash_phi = [ Int('hash_%s' % symbol) for symbol in fa_a_copy.alphabet ]  # Both FA A and FA B: hash_phi.
 
         # FA A and FA B variables.
-        fa_a_transitions_names = fa_a_orig.get_transitions_names()
+        fa_a_transitions_names = fa_a_copy.get_transitions_names()
         a_y_t = [ Int('a_y_%s' % transition) for transition in fa_a_transitions_names ]  # FA A: y_t.
-        fa_b_transitions_names = fa_b_orig.get_transitions_names()
+        fa_b_transitions_names = fa_b_copy.get_transitions_names()
         b_y_t = [ Int('b_y_%s' % transition) for transition in fa_b_transitions_names ]  # FA B: y_t.
-        a_u_q = [ Int('a_u_%s' % state) for state in fa_a_orig.states ]  # FA A: u_q.
-        b_u_q = [ Int('b_u_%s' % state) for state in fa_b_orig.states ]  # FA B: u_q.
+        a_u_q = [ Int('a_u_%s' % state) for state in fa_a_copy.states ]  # FA A: u_q.
+        b_u_q = [ Int('b_u_%s' % state) for state in fa_b_copy.states ]  # FA B: u_q.
 
         # FA A: First conjunct.
-        for state in fa_a_orig.states:
-            smt.add(Int('a_u_%s' % state) + Sum([Int('a_y_%s' % transition) for transition in fa_a_orig.get_ingoing_transitions_names(state)]) - Sum([Int('a_y_%s' % transition) for transition in fa_a_orig.get_outgoing_transitions_names(state)]) == 0)
+        for state in fa_a_copy.states:
+            smt.add(Int('a_u_%s' % state) + Sum([Int('a_y_%s' % transition) for transition in fa_a_copy.get_ingoing_transitions_names(state)]) - Sum([Int('a_y_%s' % transition) for transition in fa_a_copy.get_outgoing_transitions_names(state)]) == 0)
 
         # FA B: First conjunct.
-        for state in fa_b_orig.states:
-            smt.add(Int('b_u_%s' % state) + Sum([Int('b_y_%s' % transition) for transition in fa_b_orig.get_ingoing_transitions_names(state)]) - Sum([Int('b_y_%s' % transition) for transition in fa_b_orig.get_outgoing_transitions_names(state)]) == 0)
+        for state in fa_b_copy.states:
+            smt.add(Int('b_u_%s' % state) + Sum([Int('b_y_%s' % transition) for transition in fa_b_copy.get_ingoing_transitions_names(state)]) - Sum([Int('b_y_%s' % transition) for transition in fa_b_copy.get_outgoing_transitions_names(state)]) == 0)
 
         # FA A: Second conjunct.
         smt.add( And( [ a_y_t[i] >= 0 for i in range( len(fa_a_transitions_names) ) ] ))
@@ -105,12 +132,12 @@ def main():
         smt.add( And( [ b_y_t[i] >= 0 for i in range( len(fa_b_transitions_names) ) ] ))
 
         # FA A: Third conjunct.
-        for symbol in fa_a_orig.alphabet:
-            smt.add(Int('hash_%s' % symbol) == Sum([Int('a_y_%s' % transition) for transition in fa_a_orig.get_transitions_names_with_symbol(symbol)]))
+        for symbol in fa_a_copy.alphabet:
+            smt.add(Int('hash_%s' % symbol) == Sum([Int('a_y_%s' % transition) for transition in fa_a_copy.get_transitions_names_with_symbol(symbol)]))
 
         # FA B: Third conjunct.
-        for symbol in fa_b_orig.alphabet:
-            smt.add(Int('hash_%s' % symbol) == Sum([Int('b_y_%s' % transition) for transition in fa_b_orig.get_transitions_names_with_symbol(symbol)]))
+        for symbol in fa_b_copy.alphabet:
+            smt.add(Int('hash_%s' % symbol) == Sum([Int('b_y_%s' % transition) for transition in fa_b_copy.get_transitions_names_with_symbol(symbol)]))
 
 
         # Define additional variables.
@@ -118,14 +145,14 @@ def main():
         q_pair_states = deque()
 
         # Enqueue the initial states.
-        for a_initial_state in fa_a_orig.start:
-            for b_initial_state in fa_b_orig.start:
-                q_pair_states.append([a_initial_state, b_initial_state, False])
+        for a_final_state in fa_a_orig.final:
+            for b_final_state in fa_b_orig.final:
+                q_pair_states.append([a_final_state, b_final_state, False])
 
         intersect_ab = LFA.get_new()
 
-        fa_a_copy = deepcopy(fa_a_orig)
-        fa_b_copy = deepcopy(fa_b_orig)
+        #fa_a_copy = fa_a_orig.reverse_complete(True)
+        #fa_b_copy = fa_b_orig.reverse_complete(True)
 
         found = False
         skipped_cnt = 0
@@ -209,7 +236,7 @@ def main():
 
                 #print(q_pair_states)
                 old_pair_states_len = len(q_pair_states)
-                make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, intersect_ab, curr_pair)
+                make_pairs(fa_a_orig_reversed, fa_b_orig_reversed, q_pair_states, q_checked_pairs, intersect_ab, curr_pair)
                 pair_states_len_diff = len(q_pair_states) - old_pair_states_len
                 #print(pair_states_len_diff)
                 #print(q_pair_states)
@@ -296,11 +323,12 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, intersect, 
                 endstates = itertools.product(fa_a_orig.transitions[a_state][label], fa_b_orig.transitions[b_state][label])
                 for endstate in endstates:
                     endstate_str = endstate[0] + "," + endstate[1]
-
-                    if label not in intersect.transitions[product_state_name]:
-                        intersect.transitions[product_state_name][label] = [endstate_str]
+                    if endstate_str not in intersect.transitions.keys():
+                        intersect.transitions[endstate_str] = {}
+                    if label not in intersect.transitions[endstate_str]:
+                        intersect.transitions[endstate_str][label] = [product_state_name]
                     else:
-                        intersect.transitions[product_state_name][label].append(endstate_str)
+                        intersect.transitions[endstate_str][label].append(product_state_name)
 
                     new_pairs_cnt += 1
                     if endstate_str not in q_checked_pairs:
@@ -323,6 +351,7 @@ def make_pairs(fa_a_orig, fa_b_orig, q_pair_states, q_checked_pairs, intersect, 
             q_pair_states[id][2] = True
         else:
             q_pair_states.append([new_pair[0], new_pair[1], single_pair])
+    pass
 
 def enqueue_next_states(q_states, fa_orig, curr_state):
     transitions = fa_orig.get_deterministic_transitions(curr_state)
@@ -380,7 +409,7 @@ def check_satisfiability(fa_a, fa_b, smt):
         else:
             smt.add(Int('b_u_%s' % state) == 0)
 
-    """
+    #"""
     # FA A: Forth conjunct.
     for state in fa_a.states:
         if state in fa_a.start:
@@ -396,7 +425,7 @@ def check_satisfiability(fa_a, fa_b, smt):
             smt.add(And( [ Int('b_y_%s' % transition) >= 0 for transition in fa_b.get_ingoing_transitions_names(state) ] ))
         else:
             smt.add(Or(And( And( Int('b_z_%s' % state) == 0 ) , And( [ Int('b_y_%s' % transition) == 0 for transition in fa_b.get_ingoing_transitions_names(state) ] ) ), Or( [ And( Int('b_y_%s' % transition) >= 0 , Int('b_z_%s' % transition.split('_')[0]) >= 0, Int('b_z_%s' % state) == Int('b_z_%s' % transition.split('_')[0]) + 1) for transition in fa_b.get_ingoing_transitions_names(state) ] )))
-    """
+    #"""
 
     # Allow multiple final states.
     #FA A: At least one of the final state is reached.
