@@ -25,8 +25,8 @@ def main():
     fa_a_name = sys.argv[1]
     fa_b_name = sys.argv[2]
 
-    fa_a_orig = symboliclib.parse(fa_a_name)
-    fa_b_orig = symboliclib.parse(fa_b_name)
+    fa_a_orig = symboliclib.parse(fa_a_name).reverse_complete()
+    fa_b_orig = symboliclib.parse(fa_b_name).reverse_complete()
 
     # Decide which automaton is bigger.
     A_larger = True
